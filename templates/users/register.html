@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="col">
+        <h2>Registro</h2>
+        <!--Formulario-->
+        <form  method="POST">
+            {% csrf_token %} 
+            {# Recorriendo los campos del formulario #}                   
+            {% for field in form  %}
+                <div class="form-group">
+                    {{field.label_tag}} {{field}} 
+                    
+                    {#Si el campo posee errores, mostrarlos#}
+                    {% if field.errors %}
+                        {{ field.errors }}
+                    {% endif %}
+                </div>                
+            {% endfor %}
+                <button type="submit" class="btn btn-primary">Registrar</button>                    
+
+        </form>
+    </div>    
+    
+{% endblock content %}
+        
+        
+        
+   
+    
