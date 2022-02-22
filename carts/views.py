@@ -1,4 +1,4 @@
-from itertools import product
+
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Cart
 from .utils  import get_or_create_cart
@@ -23,9 +23,11 @@ def add(request):
     #    'quantity' : quantity
     #    }) 
 
-    cart:product = CartProducts.objects.create_or_update_quantity(cart=cart,product=product,quantity=quantity)
+    cart_product = CartProducts.objects.create_or_update_quantity(cart=cart,product=product,quantity=quantity)
     
     return render(request,'carts/add.html',{
+        'quantity' : quantity,
+        'cart_product': cart_product,
         'product': product
     })
  

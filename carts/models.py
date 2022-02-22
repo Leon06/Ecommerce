@@ -1,10 +1,8 @@
 import decimal
-from itertools import product
+
 from django.db import models
 
 import uuid
-
-from django.forms import model_to_dict
 
 from users.models import User
 from products.models import Product
@@ -32,8 +30,6 @@ class Cart(models.Model):
     def update_subtotal(self):
         self.subtotal = sum([
             cp.quantity * cp.product.price for cp in self.products_related()
-                
-
          ])
         self.save()
     
@@ -81,7 +77,9 @@ def update_totals(sender,instance,action, *args, **kwargs):
 
 #callBack
 def post_save_update_totals(sender, instance, *args, **kwargs):
-    instance.Cart.update_totals()
+    instance.cart.update_totals()
+    
+    
 
 
 pre_save.connect(set_cart_id, sender=Cart)
