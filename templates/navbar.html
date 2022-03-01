@@ -5,6 +5,7 @@
 {% url 'login' as login %}
 {% url 'register' as register %}
 {% url 'carts:cart' as cart %}
+{% url 'shipping_addresses:shipping_addresses' as shipping_addresses %}
 
 
 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
@@ -24,6 +25,15 @@
                     Mi carrito <span class="fas fa-shopping-cart"> </span>
                 </a>
             </li>
+            
+            {% if user.is_authenticated %}
+            <li class="nav-item {% if request.path == shipping_addresses %} active {% endif %}">
+                <a class="nav-link" href="{{ shipping_addresses }}">
+                    Mis direcciones <span class="fas fa-location-arrow"> </span>
+                </a>
+            </li>
+            {% endif %}
+
         </ul>
 
         <ul class="nav navbar-nav ml-auto">

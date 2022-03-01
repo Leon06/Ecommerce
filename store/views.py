@@ -1,5 +1,5 @@
 
-from itertools import product
+from django.http import  HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import redirect
 
@@ -10,9 +10,7 @@ from django.contrib.auth import authenticate
 
 #from django.contrib.auth.models import User
 from users.models import User
-
 from products.models import Product 
-
 from .forms import RegisterForm
 
 
@@ -33,6 +31,10 @@ def login_view(request):
         if user:
             login(request, user)
             messages.success(request, f'Bienvenido {user.username}')           
+
+            if request.GET.get('next'):#si la peticion posee el parametro 'next' en la url 
+                return HttpResponseRedirect(request.GET['next'])
+
             return redirect('index')
         else:
             messages.error(request, 'Usuario no valido')

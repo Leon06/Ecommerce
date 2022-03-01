@@ -17,8 +17,12 @@ class Cart(models.Model):
     subtotal = models.DecimalField(default=0, max_digits=8, decimal_places=0)
     total = models.DecimalField(default=0, max_digits=8, decimal_places=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    FEE = 0.02 #0.2%
+
+    class Meta:
+        verbose_name = "Carro"
+        verbose_name_plural = "Carros"
+
+    FEE = 0 #0.2%
     
     def __str__(self):
         return self.cart_id
@@ -26,6 +30,10 @@ class Cart(models.Model):
     def update_totals(self):
         self.update_subtotal()
         self.update_total()
+
+        if self.order:
+            self.order.update_total()
+
         
     def update_subtotal(self):
         self.subtotal = sum([
@@ -40,6 +48,10 @@ class Cart(models.Model):
     # Obtenemos todos los objetos CartProducts y a su vez todos los objetos Product
     def products_related(self):
       return self.cartproducts_set.select_related('product')
+
+    @property
+    def order(self):
+        return self.order_set.first()
   
 #Metodos que queremos que nuestro Objeto objects extienda
 class CartProductsManager(models.Manager):
