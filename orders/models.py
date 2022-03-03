@@ -1,6 +1,8 @@
 from enum import Enum
+from tkinter import CASCADE
 import uuid
 from django.db import models
+from shipping_addresses.models import ShippingAddress
 from users.models import User
 from carts.models import Cart
 
@@ -23,6 +25,7 @@ class Order(models.Model):
     shipping_total = models.DecimalField(default=0, max_digits=8,decimal_places=0)
     total = models.DecimalField(default=0, max_digits=8,decimal_places=0)
     created_at= models.DateTimeField(auto_now_add=True)
+    shipping_address = models.ForeignKey(ShippingAddress, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Pedido"
@@ -38,6 +41,30 @@ class Order(models.Model):
 
     def get_total(self):
         return self.cart.total + self.shipping_total
+
+    #Establecemos la direccion de envio a nuestra orden
+    def get_or_set_shipping_address(self):
+        if self.shipping_address:
+            return self.shipping_address
+        
+        shipping_address = self.user.shipping_address#Obtenemos la direccion principal del usuario
+        if shipping_address:
+            self.update_shipping_address(shipping_address)
+
+        return shipping_address
+
+    def update_shipping_address(self, shipping_address):
+        self.shipping_address = shipping_address
+        self.save()
+
+    def cancel(self):
+        self.status = OrderStatus.CANCELED
+        self.save()
+
+    def complete(self):
+        self.status =OrderStatus.COMPLETED
+        self.save()
+
 
         
 #callback (signals)

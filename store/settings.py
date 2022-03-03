@@ -117,3 +117,10 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+#Definir las costantes con que servidor de correo nos vamos a conectar
+
+EMAIL_HOST = 'smtp.googlemail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config('USER_MAIL')
+EMAIL_HOST_PASSWORD = config('USER_MAIL_PASSWORD')
+EMAIL_USE_TLS = True
