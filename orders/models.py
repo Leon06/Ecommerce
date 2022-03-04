@@ -8,13 +8,9 @@ from carts.models import Cart
 
 from django.db.models.signals import pre_save
 
-class OrderStatus(Enum):
-    CREATED = 'CREATED'
-    PAYED = 'PAYED'
-    COMPLETED = 'COMPLETED'
-    CANCELED = 'CANCELED'
+from .common import OrderStatus
+from .common import choices
 
-choices = [(tag, tag.value) for tag in OrderStatus]
 
 
 class Order(models.Model):

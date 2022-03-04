@@ -10,6 +10,7 @@ urlpatterns =[
     path('establecer/direccion/<int:pk>',views.check_address, name="check_address"),
     path('confirmacion/',views.confirm, name='confirm'),
     path('cancelar/',views.cancel, name='cancel'),
-    path('complete/',views.complete, name='complete')
+    path('complete/',views.complete, name='complete'),
+    path('completados/',views.OrderListView.as_view(), name='completeds')
 
 ]

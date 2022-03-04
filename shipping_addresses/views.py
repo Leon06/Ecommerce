@@ -19,7 +19,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 
 class ShippingAdrressListView(LoginRequiredMixin, ListView):
-    login_url = 'login'
+    login_url = 'login' #LoginRequiredMixin
     model = ShippingAddress
     template_name = "shipping_addresses/shipping_addresses.html"
 

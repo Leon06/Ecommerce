@@ -1,3 +1,5 @@
+
+from django.views.generic.list import ListView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,10 +16,25 @@ from carts.models import Cart
 from carts.utils import get_or_create_cart
 from carts.utils import destroy_cart
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.query import EmptyQuerySet
+
+
+from .decorators import validate_cart_and_order
+
+import threading
+
+class OrderListView(LoginRequiredMixin,ListView):
+    login_url = 'login'  #LoginRequiredMixin
+    template_name = 'orders/orders.html'
+
+    def get_queryset(self):
+        return self.request.user.orders_completed()
+
+
 @login_required(login_url='login')
-def order(request):
-    cart = get_or_create_cart(request)
-    order = get_or_created_order(cart, request)
+@validate_cart_and_order
+def order(request,cart, order):
 
     return render(request, 'orders/order.html',{
         'cart':cart,
@@ -26,10 +43,10 @@ def order(request):
 
     })
 
+
 @login_required(login_url='login')
-def address(request):
-    cart = get_or_create_cart(request)
-    order = get_or_created_order(cart,request)
+@validate_cart_and_order
+def address(request,cart, order):
 
     shipping_address = order.get_or_set_shipping_address #Asi obtenemos la direccion de envio de la orden
     can_choose_address = request.user.shippingaddress_set.count()>1
@@ -42,6 +59,7 @@ def address(request):
         'can_choose_address':can_choose_address
     })
 
+
 @login_required(login_url='login')
 def select_address(request):
     shipping_addresses = request.user.shippingaddress_set.all()#obtenemos todas las direcciones del usuario autenticado
@@ -52,9 +70,8 @@ def select_address(request):
     })
 
 @login_required(login_url='login')
-def check_address(request,pk):
-    cart = get_or_create_cart(request)
-    order = get_or_created_order(cart, request) #obtenemos la orden de compra
+@validate_cart_and_order
+def check_address(request, cart, order, pk):
 
     shipping_address = get_object_or_404(ShippingAddress, pk=pk)
 
@@ -66,9 +83,8 @@ def check_address(request,pk):
 
 
 @login_required(login_url='login')
-def confirm(request):
-    cart= get_or_create_cart(request)
-    order = get_or_created_order(cart, request)
+@validate_cart_and_order
+def confirm(request,cart,order):
 
     shipping_address = order.shipping_address
     if shipping_address is None:
@@ -84,9 +100,8 @@ def confirm(request):
 
 
 @login_required(login_url='login')
-def cancel(request):
-    cart = get_or_create_cart(request)
-    order = get_or_created_order(cart, request)
+@validate_cart_and_order
+def cancel(request,cart,order):
 
     if request.user.id != order.user_id:
         return redirect('carts:cart')
@@ -98,18 +113,23 @@ def cancel(request):
     messages.error(request, 'Orden cancelada')
     return redirect('index')
 
-
+#Completo
 @login_required(login_url='login')
-def complete(request):
-
-    cart =get_or_create_cart(request)
-    order = get_or_created_order(cart,request)
+@validate_cart_and_order
+def complete(request,cart, order):
 
     if request.user.id != order.user_id:
         return redirect('carts:cart')
 
     order.complete()
-    Mail.send_complete_order(order,request.user)
+    #Mail.send_complete_order(order,request.user)
+
+    #Enviar correo de forma asincrona
+    thread = threading.Thread(target=Mail.send_complete_order, args=(
+        order , request.user
+    ))
+    thread.start
+
 
     destroy_cart(request)
     destroy_order(request)
