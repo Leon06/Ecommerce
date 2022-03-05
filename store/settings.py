@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'users',
     'carts',
     'orders',
-    'shipping_addresses'
+    'shipping_addresses',
+    'promo_codes'
 ]
 
 MIDDLEWARE = [
@@ -96,7 +97,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 

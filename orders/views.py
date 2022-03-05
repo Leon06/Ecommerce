@@ -49,7 +49,7 @@ def order(request,cart, order):
 def address(request,cart, order):
 
     shipping_address = order.get_or_set_shipping_address #Asi obtenemos la direccion de envio de la orden
-    can_choose_address = request.user.shippingaddress_set.count()>1
+    can_choose_address = request.user.has_shipping_addresses()
 
     return render(request,'orders/address.html',{
         'cart': cart,
@@ -62,7 +62,7 @@ def address(request,cart, order):
 
 @login_required(login_url='login')
 def select_address(request):
-    shipping_addresses = request.user.shippingaddress_set.all()#obtenemos todas las direcciones del usuario autenticado
+    shipping_addresses = request.user.addresses
 
     return render(request, 'orders/select_address.html',{
         'breadcrumb':breadcrumb(address=True),
@@ -113,7 +113,7 @@ def cancel(request,cart,order):
     messages.error(request, 'Orden cancelada')
     return redirect('index')
 
-#Completo
+#Completed
 @login_required(login_url='login')
 @validate_cart_and_order
 def complete(request,cart, order):
@@ -128,7 +128,7 @@ def complete(request,cart, order):
     thread = threading.Thread(target=Mail.send_complete_order, args=(
         order , request.user
     ))
-    thread.start
+    thread.start()
 
 
     destroy_cart(request)

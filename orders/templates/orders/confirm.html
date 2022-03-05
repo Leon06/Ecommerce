@@ -44,7 +44,8 @@
                         <div class="font-weight-bold">
                             Código Promocional
                         </div>
-                        <form>
+                        
+                        <form id="promocode-form" action="{% url 'promo_code:validate' %}">
                             <input type="text" name="code" value="" class="form-control" placeholder="Código Promocional">  
                         </form>
                         
@@ -74,3 +75,26 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block javascript %}
+    
+    <!--Peticion asincrona codigo promocional-->
+    <script>
+        const form = document.getElementById('promocode-form')
+        form.addEventListener('submit',function(e){
+            e.preventDefault()
+
+            const input = this.code
+            const code = input.value
+            const url = this.action + "?code=" + code
+
+            fetch(url)
+                .then(response => response.json() )
+                .then(response =>{
+                    console.log(response.total)
+                })
+
+        })
+    </script>
+
+{% endblock javascript %}
